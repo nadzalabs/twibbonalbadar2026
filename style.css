@@ -1,6 +1,6 @@
-/* ===================================================
+/* ==========================================================
    RESET
-=================================================== */
+========================================================== */
 
 *{
     margin:0;
@@ -16,18 +16,19 @@ body{
 
     font-family:
     "Segoe UI",
-    Tahoma,
-    Geneva,
-    Verdana,
+    Arial,
     sans-serif;
 
-    background:linear-gradient(
+    background:
+    linear-gradient(
         135deg,
-        #0d4d40,
-        #17755d
+        #0d5c47,
+        #198754
     );
 
     min-height:100vh;
+
+    padding:30px 15px;
 
     display:flex;
 
@@ -35,21 +36,17 @@ body{
 
     align-items:center;
 
-    padding:40px 20px;
-
-    color:#222;
-
 }
 
-/* ===================================================
+/* ==========================================================
    CONTAINER
-=================================================== */
+========================================================== */
 
 .container{
 
     width:100%;
 
-    max-width:820px;
+    max-width:900px;
 
     background:#ffffff;
 
@@ -58,23 +55,24 @@ body{
     overflow:hidden;
 
     box-shadow:
-    0 20px 60px rgba(0,0,0,.25);
+
+        0 20px 60px rgba(0,0,0,.25);
 
 }
 
-/* ===================================================
+/* ==========================================================
    HEADER
-=================================================== */
+========================================================== */
 
 .header{
-
-    padding:35px 25px;
-
-    text-align:center;
 
     background:#0f6b56;
 
     color:white;
+
+    text-align:center;
+
+    padding:35px 25px;
 
 }
 
@@ -82,7 +80,7 @@ body{
 
     font-size:34px;
 
-    font-weight:700;
+    margin-bottom:10px;
 
     letter-spacing:.5px;
 
@@ -90,25 +88,19 @@ body{
 
 .header p{
 
-    margin-top:10px;
-
     opacity:.9;
 
     font-size:17px;
 
 }
 
-/* ===================================================
+/* ==========================================================
    PREVIEW
-=================================================== */
+========================================================== */
 
 .preview-section{
 
     padding:35px;
-
-    display:flex;
-
-    justify-content:center;
 
 }
 
@@ -118,13 +110,15 @@ body{
 
     width:100%;
 
-    max-width:560px;
+    max-width:600px;
 
-    aspect-ratio:1/1;
+    aspect-ratio:1;
 
-    background:#eeeeee;
+    margin:auto;
 
-    border-radius:20px;
+    background:#ececec;
+
+    border-radius:18px;
 
     overflow:hidden;
 
@@ -133,35 +127,39 @@ body{
     touch-action:none;
 
     box-shadow:
-    inset 0 0 12px rgba(0,0,0,.08);
+
+        inset 0 0 15px rgba(0,0,0,.08);
 
 }
 
-/* FOTO */
+/* ==========================================================
+   FOTO
+========================================================== */
 
 #photo{
 
     position:absolute;
 
-    top:50%;
-
     left:50%;
 
+    top:50%;
+
     transform:
-    translate(-50%,-50%)
-    scale(1);
-
-    transform-origin:center;
-
-    max-width:none;
-
-    cursor:grab;
+        translate(-50%,-50%);
 
     display:none;
 
+    cursor:grab;
+
+    max-width:none;
+
+    user-select:none;
+
 }
 
-/* FRAME */
+/* ==========================================================
+   FRAME
+========================================================== */
 
 #frame{
 
@@ -181,19 +179,17 @@ body{
 
 }
 
-/* ===================================================
-   CONTROL
-=================================================== */
+/* ==========================================================
+   LOADING
+========================================================== */
 
-.control-section{
+.loading{
 
-    padding:0 35px 35px;
+    position:absolute;
 
-}
+    inset:0;
 
-.upload-button{
-
-    width:100%;
+    background:rgba(255,255,255,.75);
 
     display:flex;
 
@@ -201,7 +197,47 @@ body{
 
     align-items:center;
 
-    height:54px;
+    font-size:18px;
+
+    font-weight:bold;
+
+    color:#0f6b56;
+
+    backdrop-filter:blur(4px);
+
+    z-index:100;
+
+}
+
+.hidden{
+
+    display:none;
+
+}
+
+/* ==========================================================
+   CONTROL
+========================================================== */
+
+.control-section{
+
+    padding:0 35px 35px;
+
+}
+
+/* Upload */
+
+.upload-button{
+
+    width:100%;
+
+    height:56px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
 
     background:#0f6b56;
 
@@ -211,29 +247,29 @@ body{
 
     cursor:pointer;
 
-    font-weight:600;
-
     transition:.25s;
+
+    font-weight:600;
 
 }
 
 .upload-button:hover{
 
-    background:#0c5b49;
+    background:#0b5948;
 
 }
 
-/* ===================================================
+/* ==========================================================
    ZOOM
-=================================================== */
+========================================================== */
 
-.slider{
+.slider-group{
 
     margin-top:25px;
 
 }
 
-.slider label{
+.slider-group label{
 
     display:block;
 
@@ -251,17 +287,17 @@ body{
 
 }
 
-/* ===================================================
+/* ==========================================================
    BUTTON
-=================================================== */
+========================================================== */
 
 .button-group{
-
-    margin-top:25px;
 
     display:flex;
 
     gap:15px;
+
+    margin-top:25px;
 
 }
 
@@ -269,7 +305,7 @@ body{
 
     flex:1;
 
-    height:52px;
+    height:54px;
 
     border:none;
 
@@ -277,13 +313,15 @@ body{
 
     cursor:pointer;
 
+    transition:.25s;
+
     font-size:16px;
 
     font-weight:600;
 
-    transition:.25s;
-
 }
+
+/* Reset */
 
 #reset{
 
@@ -293,9 +331,11 @@ body{
 
 #reset:hover{
 
-    background:#cfd6de;
+    background:#ced4da;
 
 }
+
+/* Download */
 
 #download{
 
@@ -305,37 +345,37 @@ body{
 
 #download:hover{
 
-    background:#e2a000;
+    background:#e0a400;
 
 }
 
-/* ===================================================
-   INFO
-=================================================== */
+/* ==========================================================
+   GUIDE
+========================================================== */
 
-.info{
+.guide{
 
     padding:35px;
 
-    background:#f8f8f8;
+    background:#f8f9fa;
 
 }
 
-.info h2{
+.guide h2{
 
     color:#0f6b56;
 
-    margin-bottom:18px;
+    margin-bottom:20px;
 
 }
 
-.info ol{
+.guide ol{
 
-    padding-left:20px;
+    padding-left:22px;
 
 }
 
-.info li{
+.guide li{
 
     margin-bottom:10px;
 
@@ -343,9 +383,9 @@ body{
 
 }
 
-/* ===================================================
+/* ==========================================================
    RESPONSIVE
-=================================================== */
+========================================================== */
 
 @media(max-width:768px){
 
@@ -357,7 +397,7 @@ body{
 
     .header{
 
-        padding:25px 20px;
+        padding:25px 15px;
 
     }
 
@@ -379,7 +419,7 @@ body{
 
     }
 
-    .info{
+    .guide{
 
         padding:25px 20px;
 
@@ -397,7 +437,7 @@ body{
 
     .header h1{
 
-        font-size:24px;
+        font-size:23px;
 
     }
 
@@ -407,15 +447,9 @@ body{
 
     }
 
-    .preview-area{
-
-        border-radius:16px;
-
-    }
-
     .upload-button{
 
-        height:50px;
+        height:52px;
 
         font-size:15px;
 
@@ -423,7 +457,7 @@ body{
 
     .button-group button{
 
-        height:48px;
+        height:50px;
 
         font-size:15px;
 
