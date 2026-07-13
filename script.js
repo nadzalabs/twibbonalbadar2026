@@ -6,6 +6,8 @@
 (function () {
   'use strict';
 
+  console.log('[Twibbon script.js] versi: MIN_OVERLAP boundary, MIN_OVERLAP_PX=60');
+
   /* ================= ELEMENT ================= */
 
   const previewEl  = document.getElementById('preview');
