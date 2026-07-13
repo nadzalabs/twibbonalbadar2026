@@ -94,6 +94,11 @@
 
   /* ================= AUTO FIT ================= */
 
+  // Extra zoom baked into the auto-fit so there is always a little
+  // room to drag the photo immediately, even before touching the
+  // zoom slider. Purely visual headroom — boundary rules still apply.
+  const OVERSCAN = 1.15;
+
   function computeBaseScale() {
     const { w: pw, h: ph } = getPreviewSize();
     if (!state.naturalWidth || !state.naturalHeight) return;
@@ -102,7 +107,7 @@
     // never stretching, never exposing empty area.
     const scaleToCoverW = pw / state.naturalWidth;
     const scaleToCoverH = ph / state.naturalHeight;
-    state.baseScale = Math.max(scaleToCoverW, scaleToCoverH);
+    state.baseScale = Math.max(scaleToCoverW, scaleToCoverH) * OVERSCAN;
   }
 
   function autoFit() {
