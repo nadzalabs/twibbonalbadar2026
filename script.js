@@ -1,237 +1,364 @@
-/* ==========================================
-   ELEMENT
-========================================== */
+/* =========================================================
+   Twibbon Al Badar 2026 - script.js
+   Vanilla JS - No dependencies - Canvas only on download
+   ========================================================= */
 
-const preview = document.getElementById("preview");
-const photo = document.getElementById("photo");
+(function () {
+  'use strict';
 
-const upload = document.getElementById("upload");
-const zoom = document.getElementById("zoom");
+  /* ================= ELEMENT ================= */
 
-const resetBtn = document.getElementById("reset");
-const downloadBtn = document.getElementById("download");
+  const previewEl  = document.getElementById('preview');
+  const photoEl    = document.getElementById('photo');
+  const frameEl    = document.getElementById('frame');
+  const uploadEl   = document.getElementById('upload');
+  const zoomEl     = document.getElementById('zoom');
+  const resetEl    = document.getElementById('reset');
+  const downloadEl = document.getElementById('download');
 
+  /* ================= STATE ================= */
 
-/* ==========================================
-   STATE
-========================================== */
+  const state = {
+    scale: 1,          // zoom slider value (1 - 3)
+    x: 0,               // pan offset x (px, preview space)
+    y: 0,               // pan offset y (px, preview space)
+    dragging: false,
+    pinching: false,
+    lastDistance: 0,
 
-let scale = 1;
+    // internal (not in spec but required for math)
+    naturalWidth: 0,
+    naturalHeight: 0,
+    baseScale: 0,       // scale required to "cover" the preview at zoom = 1
+    hasImage: false,
 
-let translateX = 0;
-let translateY = 0;
+    startX: 0,
+    startY: 0,
+    startPointerX: 0,
+    startPointerY: 0,
 
-let startX = 0;
-let startY = 0;
+    needsRender: false
+  };
 
-let isDragging = false;
+  /* ================= UTILITIES ================= */
 
-let baseWidth = 0;
-let baseHeight = 0;
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
 
+  function getPreviewSize() {
+    const rect = previewEl.getBoundingClientRect();
+    return { w: rect.width, h: rect.height };
+  }
 
-/* ==========================================
-   UPDATE PHOTO
-========================================== */
+  function getDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
 
-function updatePhoto(){
+  function getMidpoint(touches) {
+    return {
+      x: (touches[0].clientX + touches[1].clientX) / 2,
+      y: (touches[0].clientY + touches[1].clientY) / 2
+    };
+  }
 
-    photo.style.transform =
-        `translate(-50%, -50%) translate(${translateX}px, ${translateY}px) scale(${scale})`;
+  function requestRender() {
+    state.needsRender = true;
+  }
 
-}
+  /* ================= RENDER ================= */
 
-
-/* ==========================================
-   AUTO FIT
-========================================== */
-
-function autoFit(){
-
-    const box = preview.getBoundingClientRect();
-
-    const boxWidth = box.width;
-    const boxHeight = box.height;
-
-    const imgWidth = photo.naturalWidth;
-    const imgHeight = photo.naturalHeight;
-
-    const ratio = Math.min(
-        boxWidth / imgWidth,
-        boxHeight / imgHeight
-    );
-
-    baseWidth = imgWidth * ratio;
-    baseHeight = imgHeight * ratio;
-
-    photo.style.width = baseWidth + "px";
-    photo.style.height = baseHeight + "px";
-
-    scale = 1;
-
-    translateX = 0;
-    translateY = 0;
-
-    zoom.value = 1;
-
-    updatePhoto();
-
-}
-
-
-/* ==========================================
-   UPLOAD
-========================================== */
-
-upload.addEventListener("change", function(e){
-
-    const file = e.target.files[0];
-
-    if(!file){
-
-        return;
-
+  function renderLoop() {
+    if (state.needsRender && state.hasImage) {
+      const totalScale = state.baseScale * state.scale;
+      photoEl.style.transform =
+        'translate(-50%, -50%) translate(' +
+        state.x + 'px, ' + state.y + 'px) scale(' + totalScale + ')';
+      state.needsRender = false;
     }
+    requestAnimationFrame(renderLoop);
+  }
+  requestAnimationFrame(renderLoop);
 
-    if(!file.type.startsWith("image/")){
+  /* ================= BOUNDARY ================= */
 
-        alert("Silakan pilih file gambar.");
+  function clampPosition() {
+    if (!state.hasImage) return;
 
-        return;
+    const { w: pw, h: ph } = getPreviewSize();
+    const totalScale = state.baseScale * state.scale;
+    const imgW = state.naturalWidth * totalScale;
+    const imgH = state.naturalHeight * totalScale;
 
-    }
+    const maxX = Math.max(0, (imgW - pw) / 2);
+    const maxY = Math.max(0, (imgH - ph) / 2);
+
+    state.x = clamp(state.x, -maxX, maxX);
+    state.y = clamp(state.y, -maxY, maxY);
+  }
+
+  /* ================= AUTO FIT ================= */
+
+  function computeBaseScale() {
+    const { w: pw, h: ph } = getPreviewSize();
+    if (!state.naturalWidth || !state.naturalHeight) return;
+
+    // Cover fit: scale so the image fully covers the square preview,
+    // never stretching, never exposing empty area.
+    const scaleToCoverW = pw / state.naturalWidth;
+    const scaleToCoverH = ph / state.naturalHeight;
+    state.baseScale = Math.max(scaleToCoverW, scaleToCoverH);
+  }
+
+  function autoFit() {
+    computeBaseScale();
+    state.scale = 1;
+    state.x = 0;
+    state.y = 0;
+    zoomEl.value = 1;
+    clampPosition();
+    requestRender();
+  }
+
+  /* ================= UPLOAD ================= */
+
+  function isSupportedFile(file) {
+    const supported = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    return supported.indexOf(file.type) !== -1;
+  }
+
+  function handleFile(file) {
+    if (!file || !isSupportedFile(file)) return;
 
     const reader = new FileReader();
-
-    reader.onload = function(event){
-
-        photo.onload = function(){
-
-            photo.style.display = "block";
-
-            autoFit();
-
-        }
-
-        photo.src = event.target.result;
-
-    }
-
-    reader.readAsDataURL(file);
-
-});
-
-
-/* ==========================================
-   ZOOM
-========================================== */
-
-zoom.addEventListener("input", function(){
-
-    scale = Number(this.value);
-
-    updatePhoto();
-
-});
-
-
-/* ==========================================
-   DRAG DESKTOP
-========================================== */
-
-photo.addEventListener("mousedown", function(e){
-
-    isDragging = true;
-
-    startX = e.clientX;
-    startY = e.clientY;
-
-    photo.classList.add("dragging");
-
-});
-
-
-window.addEventListener("mousemove", function(e){
-
-    if(!isDragging){
-
-        return;
-
-    }
-
-    translateX += e.clientX - startX;
-    translateY += e.clientY - startY;
-
-    startX = e.clientX;
-    startY = e.clientY;
-
-    updatePhoto();
-
-});
-
-
-window.addEventListener("mouseup", function(){
-
-    isDragging = false;
-
-    photo.classList.remove("dragging");
-
-});
-
-
-/* ==========================================
-   DRAG MOBILE
-========================================== */
-
-photo.addEventListener("touchstart", function(e){
-
-    isDragging = true;
-
-    startX = e.touches[0].clientX;
-    startY = e.touches[0].clientY;
-
-});
-
-
-window.addEventListener("touchmove", function(e){
-
-    if(!isDragging){
-
-        return;
-
-    }
-
-    translateX +=
-        e.touches[0].clientX - startX;
-
-    translateY +=
-        e.touches[0].clientY - startY;
-
-    startX = e.touches[0].clientX;
-    startY = e.touches[0].clientY;
-
-    updatePhoto();
-
-},{passive:true});
-
-
-window.addEventListener("touchend", function(){
-
-    isDragging = false;
-
-});
-
-
-/* ==========================================
-   RESPONSIVE
-========================================== */
-
-window.addEventListener("resize", function(){
-
-    if(photo.src){
-
+    reader.onload = function (e) {
+      const img = new Image();
+      img.onload = function () {
+        state.naturalWidth = img.naturalWidth;
+        state.naturalHeight = img.naturalHeight;
+        photoEl.src = e.target.result;
+        state.hasImage = true;
         autoFit();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
 
+  uploadEl.addEventListener('change', function (e) {
+    const file = e.target.files && e.target.files[0];
+    if (file) handleFile(file);
+  });
+
+  /* ================= DESKTOP DRAG ================= */
+
+  previewEl.addEventListener('mousedown', function (e) {
+    if (!state.hasImage) return;
+    state.dragging = true;
+    state.startX = state.x;
+    state.startY = state.y;
+    state.startPointerX = e.clientX;
+    state.startPointerY = e.clientY;
+    previewEl.style.cursor = 'grabbing';
+  });
+
+  window.addEventListener('mousemove', function (e) {
+    if (!state.dragging || !state.hasImage) return;
+    const dx = e.clientX - state.startPointerX;
+    const dy = e.clientY - state.startPointerY;
+    state.x = state.startX + dx;
+    state.y = state.startY + dy;
+    clampPosition();
+    requestRender();
+  });
+
+  window.addEventListener('mouseup', function () {
+    if (state.dragging) {
+      state.dragging = false;
+      previewEl.style.cursor = 'grab';
     }
+  });
 
-});
+  window.addEventListener('mouseleave', function () {
+    if (state.dragging) {
+      state.dragging = false;
+      previewEl.style.cursor = 'grab';
+    }
+  });
+
+  /* ================= MOBILE DRAG ================= */
+
+  previewEl.addEventListener('touchstart', function (e) {
+    if (!state.hasImage) return;
+
+    if (e.touches.length === 1) {
+      state.dragging = true;
+      state.pinching = false;
+      state.startX = state.x;
+      state.startY = state.y;
+      state.startPointerX = e.touches[0].clientX;
+      state.startPointerY = e.touches[0].clientY;
+    } else if (e.touches.length === 2) {
+      state.dragging = false;
+      state.pinching = true;
+      state.lastDistance = getDistance(e.touches);
+    }
+  }, { passive: true });
+
+  previewEl.addEventListener('touchmove', function (e) {
+    if (!state.hasImage) return;
+
+    if (state.pinching && e.touches.length === 2) {
+      e.preventDefault();
+      const newDistance = getDistance(e.touches);
+      if (state.lastDistance > 0) {
+        const ratio = newDistance / state.lastDistance;
+        state.scale = clamp(state.scale * ratio, 1, 3);
+        zoomEl.value = state.scale;
+      }
+      state.lastDistance = newDistance;
+      clampPosition();
+      requestRender();
+    } else if (state.dragging && e.touches.length === 1) {
+      e.preventDefault();
+      const dx = e.touches[0].clientX - state.startPointerX;
+      const dy = e.touches[0].clientY - state.startPointerY;
+      state.x = state.startX + dx;
+      state.y = state.startY + dy;
+      clampPosition();
+      requestRender();
+    }
+  }, { passive: false });
+
+  previewEl.addEventListener('touchend', function (e) {
+    if (e.touches.length === 0) {
+      state.dragging = false;
+      state.pinching = false;
+      state.lastDistance = 0;
+    } else if (e.touches.length === 1) {
+      // transitioned from pinch to single-finger drag
+      state.pinching = false;
+      state.lastDistance = 0;
+      state.dragging = true;
+      state.startX = state.x;
+      state.startY = state.y;
+      state.startPointerX = e.touches[0].clientX;
+      state.startPointerY = e.touches[0].clientY;
+    }
+  }, { passive: true });
+
+  previewEl.addEventListener('touchcancel', function () {
+    state.dragging = false;
+    state.pinching = false;
+    state.lastDistance = 0;
+  }, { passive: true });
+
+  /* ================= PINCH ZOOM (handled above in touchmove) ================= */
+
+  /* ================= MOUSE WHEEL ================= */
+
+  previewEl.addEventListener('wheel', function (e) {
+    if (!state.hasImage) return;
+    e.preventDefault();
+
+    const delta = -e.deltaY * 0.0015;
+    state.scale = clamp(state.scale + delta * state.scale, 1, 3);
+    zoomEl.value = state.scale;
+
+    clampPosition();
+    requestRender();
+  }, { passive: false });
+
+  /* ================= ZOOM SLIDER ================= */
+
+  zoomEl.addEventListener('input', function () {
+    if (!state.hasImage) return;
+    state.scale = clamp(parseFloat(zoomEl.value), 1, 3);
+    clampPosition();
+    requestRender();
+  });
+
+  /* ================= RESET ================= */
+
+  resetEl.addEventListener('click', function () {
+    if (!state.hasImage) return;
+    autoFit();
+  });
+
+  /* ================= DOWNLOAD ================= */
+
+  function loadImageFromSrc(src) {
+    return new Promise(function (resolve, reject) {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function () { resolve(img); };
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
+
+  function triggerDownload(canvas) {
+    const link = document.createElement('a');
+    link.download = 'Twibbon_AlBadar_2026.png';
+    link.href = canvas.toDataURL('image/png', 1.0);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  downloadEl.addEventListener('click', function () {
+    if (!state.hasImage) return;
+
+    const CANVAS_SIZE = 2048;
+    const canvas = document.createElement('canvas');
+    canvas.width = CANVAS_SIZE;
+    canvas.height = CANVAS_SIZE;
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    const { w: pw } = getPreviewSize();
+    const canvasScale = CANVAS_SIZE / pw;
+    const totalScale = state.baseScale * state.scale;
+
+    const drawW = state.naturalWidth * totalScale * canvasScale;
+    const drawH = state.naturalHeight * totalScale * canvasScale;
+
+    const centerX = CANVAS_SIZE / 2 + state.x * canvasScale;
+    const centerY = CANVAS_SIZE / 2 + state.y * canvasScale;
+
+    const drawX = centerX - drawW / 2;
+    const drawY = centerY - drawH / 2;
+
+    loadImageFromSrc(photoEl.src)
+      .then(function (photoImg) {
+        ctx.drawImage(photoImg, drawX, drawY, drawW, drawH);
+        return loadImageFromSrc(frameEl.src);
+      })
+      .then(function (frameImg) {
+        ctx.drawImage(frameImg, 0, 0, CANVAS_SIZE, CANVAS_SIZE);
+        triggerDownload(canvas);
+      })
+      .catch(function () {
+        // Fallback: draw whatever is available even if one image failed
+        try {
+          ctx.drawImage(frameEl, 0, 0, CANVAS_SIZE, CANVAS_SIZE);
+        } catch (err) { /* ignore */ }
+        triggerDownload(canvas);
+      });
+  });
+
+  /* ================= EVENTS ================= */
+
+  window.addEventListener('resize', function () {
+    if (!state.hasImage) return;
+    computeBaseScale();
+    clampPosition();
+    requestRender();
+  });
+
+  previewEl.style.cursor = 'grab';
+
+})();
