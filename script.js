@@ -1,116 +1,87 @@
-// ========================================
-// ELEMENT
-// ========================================
+/* ==========================================
+   ELEMENT
+========================================== */
+
+const preview = document.getElementById("preview");
+const photo = document.getElementById("photo");
 
 const upload = document.getElementById("upload");
-const photo = document.getElementById("photo");
-const loading = document.getElementById("loading");
-const preview = document.getElementById("preview");
 const zoom = document.getElementById("zoom");
 
-// ========================================
-// STATE
-// ========================================
+const resetBtn = document.getElementById("reset");
+const downloadBtn = document.getElementById("download");
 
-let imageLoaded = false;
 
-let currentScale = 1;
+/* ==========================================
+   STATE
+========================================== */
+
+let scale = 1;
 
 let translateX = 0;
-
 let translateY = 0;
 
-let baseWidth = 0;
+let startX = 0;
+let startY = 0;
 
+let isDragging = false;
+
+let baseWidth = 0;
 let baseHeight = 0;
 
-// ========================================
-// SHOW LOADING
-// ========================================
 
-function showLoading(){
-
-    loading.classList.remove("hidden");
-
-}
-
-// ========================================
-// HIDE LOADING
-// ========================================
-
-function hideLoading(){
-
-    loading.classList.add("hidden");
-
-}
-
-// ========================================
-// RESET TRANSFORM
-// ========================================
-
-function resetTransform(){
-
-    currentScale = 1;
-
-    translateX = 0;
-
-    translateY = 0;
-
-    zoom.value = 1;
-
-}
-
-// ========================================
-// APPLY CSS TRANSFORM
-// ========================================
+/* ==========================================
+   UPDATE PHOTO
+========================================== */
 
 function updatePhoto(){
 
     photo.style.transform =
-        `translate(-50%, -50%) translate(${translateX}px, ${translateY}px) scale(${currentScale})`;
+        `translate(-50%, -50%) translate(${translateX}px, ${translateY}px) scale(${scale})`;
 
 }
 
-// ========================================
-// AUTO FIT
-// ========================================
+
+/* ==========================================
+   AUTO FIT
+========================================== */
 
 function autoFit(){
 
     const box = preview.getBoundingClientRect();
 
-    const boxSize = Math.min(box.width, box.height);
+    const boxWidth = box.width;
+    const boxHeight = box.height;
 
-    const imgRatio =
-        photo.naturalWidth / photo.naturalHeight;
+    const imgWidth = photo.naturalWidth;
+    const imgHeight = photo.naturalHeight;
 
-    if(imgRatio > 1){
+    const ratio = Math.min(
+        boxWidth / imgWidth,
+        boxHeight / imgHeight
+    );
 
-        baseWidth = boxSize;
-
-        baseHeight = boxSize / imgRatio;
-
-    }else{
-
-        baseHeight = boxSize;
-
-        baseWidth = boxSize * imgRatio;
-
-    }
+    baseWidth = imgWidth * ratio;
+    baseHeight = imgHeight * ratio;
 
     photo.style.width = baseWidth + "px";
-
     photo.style.height = baseHeight + "px";
 
-    resetTransform();
+    scale = 1;
+
+    translateX = 0;
+    translateY = 0;
+
+    zoom.value = 1;
 
     updatePhoto();
 
 }
 
-// ========================================
-// UPLOAD FOTO
-// ========================================
+
+/* ==========================================
+   UPLOAD
+========================================== */
 
 upload.addEventListener("change", function(e){
 
@@ -124,13 +95,11 @@ upload.addEventListener("change", function(e){
 
     if(!file.type.startsWith("image/")){
 
-        alert("File harus berupa gambar.");
+        alert("Silakan pilih file gambar.");
 
         return;
 
     }
-
-    showLoading();
 
     const reader = new FileReader();
 
@@ -138,31 +107,128 @@ upload.addEventListener("change", function(e){
 
         photo.onload = function(){
 
-            imageLoaded = true;
-
             photo.style.display = "block";
 
             autoFit();
 
-            hideLoading();
-
-        };
+        }
 
         photo.src = event.target.result;
 
-    };
+    }
 
     reader.readAsDataURL(file);
 
 });
 
-// ========================================
-// RESPONSIVE
-// ========================================
+
+/* ==========================================
+   ZOOM
+========================================== */
+
+zoom.addEventListener("input", function(){
+
+    scale = Number(this.value);
+
+    updatePhoto();
+
+});
+
+
+/* ==========================================
+   DRAG DESKTOP
+========================================== */
+
+photo.addEventListener("mousedown", function(e){
+
+    isDragging = true;
+
+    startX = e.clientX;
+    startY = e.clientY;
+
+    photo.classList.add("dragging");
+
+});
+
+
+window.addEventListener("mousemove", function(e){
+
+    if(!isDragging){
+
+        return;
+
+    }
+
+    translateX += e.clientX - startX;
+    translateY += e.clientY - startY;
+
+    startX = e.clientX;
+    startY = e.clientY;
+
+    updatePhoto();
+
+});
+
+
+window.addEventListener("mouseup", function(){
+
+    isDragging = false;
+
+    photo.classList.remove("dragging");
+
+});
+
+
+/* ==========================================
+   DRAG MOBILE
+========================================== */
+
+photo.addEventListener("touchstart", function(e){
+
+    isDragging = true;
+
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+
+});
+
+
+window.addEventListener("touchmove", function(e){
+
+    if(!isDragging){
+
+        return;
+
+    }
+
+    translateX +=
+        e.touches[0].clientX - startX;
+
+    translateY +=
+        e.touches[0].clientY - startY;
+
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+
+    updatePhoto();
+
+},{passive:true});
+
+
+window.addEventListener("touchend", function(){
+
+    isDragging = false;
+
+});
+
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
 
 window.addEventListener("resize", function(){
 
-    if(imageLoaded){
+    if(photo.src){
 
         autoFit();
 
