@@ -3,21 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Twibbon Generator</title>
+
+    <title>Twibbon FORTASI 2025 SMP MBS Al Badar</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <h1>Twibbon Generator</h1>
+<div class="container">
 
-    <div class="canvas-container">
+    <h1>TWIBBON FORTASI 2025</h1>
+    <p class="subtitle">
+        SMP MBS AL BADAR PRAMBANAN
+    </p>
 
+    <div class="editor">
+
+        <!-- Canvas -->
         <canvas id="canvas" width="1080" height="1080"></canvas>
+
+        <!-- Frame -->
+        <img id="frame" src="frame.png" alt="Frame Twibbon">
 
     </div>
 
-    <script src="script.js"></script>
+    <div class="controls">
+
+        <label class="upload-btn">
+            Pilih Foto
+            <input type="file"
+                   id="upload"
+                   accept="image/*"
+                   hidden>
+        </label>
+
+        <div class="slider-box">
+
+            <label for="zoom">
+                Zoom Foto
+            </label>
+
+            <input
+                type="range"
+                id="zoom"
+                min="0.5"
+                max="3"
+                step="0.01"
+                value="1">
+
+        </div>
+
+        <button id="download">
+            Download Twibbon
+        </button>
+
+    </div>
+
+    <div class="petunjuk">
+
+        <h3>Cara Menggunakan</h3>
+
+        <ol>
+
+            <li>Pilih foto.</li>
+
+            <li>Geser foto menggunakan mouse atau jari.</li>
+
+            <li>Atur ukuran menggunakan slider zoom.</li>
+
+            <li>Klik <b>Download Twibbon</b>.</li>
+
+        </ol>
+
+    </div>
+
+</div>
+
+<script src="script.js"></script>
 
 </body>
 </html>
