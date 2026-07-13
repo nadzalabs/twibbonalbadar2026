@@ -97,7 +97,7 @@
   // Extra zoom baked into the auto-fit so there is always a little
   // room to drag the photo immediately, even before touching the
   // zoom slider. Purely visual headroom — boundary rules still apply.
-  const OVERSCAN = 1.4;
+  const OVERSCAN = 1.7;
 
   function computeBaseScale() {
     const { w: pw, h: ph } = getPreviewSize();
