@@ -1,88 +1,150 @@
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+// ========================================
+// ELEMENT
+// ========================================
 
 const upload = document.getElementById("upload");
-const zoomSlider = document.getElementById("zoom");
-const downloadBtn = document.getElementById("download");
+const photo = document.getElementById("photo");
+const loading = document.getElementById("loading");
+const preview = document.getElementById("preview");
+const zoom = document.getElementById("zoom");
 
-const frame = new Image();
-frame.src = "frame.png";
+// ========================================
+// STATE
+// ========================================
 
-let photo = null;
+let imageLoaded = false;
 
-let scale = 1;
+let currentScale = 1;
 
-let posX = 540;
-let posY = 540;
+let translateX = 0;
 
-let dragging = false;
+let translateY = 0;
 
-let startX = 0;
-let startY = 0;
+let baseWidth = 0;
 
-const SIZE = 1080;
+let baseHeight = 0;
 
-canvas.width = SIZE;
-canvas.height = SIZE;
+// ========================================
+// SHOW LOADING
+// ========================================
 
-function drawCanvas() {
+function showLoading(){
 
-    ctx.clearRect(0, 0, SIZE, SIZE);
-
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, SIZE, SIZE);
-
-    if (photo) {
-
-        const w = photo.width * scale;
-        const h = photo.height * scale;
-
-        ctx.drawImage(
-            photo,
-            posX - w / 2,
-            posY - h / 2,
-            w,
-            h
-        );
-    }
-
-    if (frame.complete) {
-
-        ctx.drawImage(frame, 0, 0, SIZE, SIZE);
-
-    }
+    loading.classList.remove("hidden");
 
 }
 
-frame.onload = drawCanvas;
+// ========================================
+// HIDE LOADING
+// ========================================
+
+function hideLoading(){
+
+    loading.classList.add("hidden");
+
+}
+
+// ========================================
+// RESET TRANSFORM
+// ========================================
+
+function resetTransform(){
+
+    currentScale = 1;
+
+    translateX = 0;
+
+    translateY = 0;
+
+    zoom.value = 1;
+
+}
+
+// ========================================
+// APPLY CSS TRANSFORM
+// ========================================
+
+function updatePhoto(){
+
+    photo.style.transform =
+        `translate(-50%, -50%) translate(${translateX}px, ${translateY}px) scale(${currentScale})`;
+
+}
+
+// ========================================
+// AUTO FIT
+// ========================================
+
+function autoFit(){
+
+    const box = preview.getBoundingClientRect();
+
+    const boxSize = Math.min(box.width, box.height);
+
+    const imgRatio =
+        photo.naturalWidth / photo.naturalHeight;
+
+    if(imgRatio > 1){
+
+        baseWidth = boxSize;
+
+        baseHeight = boxSize / imgRatio;
+
+    }else{
+
+        baseHeight = boxSize;
+
+        baseWidth = boxSize * imgRatio;
+
+    }
+
+    photo.style.width = baseWidth + "px";
+
+    photo.style.height = baseHeight + "px";
+
+    resetTransform();
+
+    updatePhoto();
+
+}
+
+// ========================================
+// UPLOAD FOTO
+// ========================================
 
 upload.addEventListener("change", function(e){
 
     const file = e.target.files[0];
 
-    if(!file) return;
+    if(!file){
+
+        return;
+
+    }
+
+    if(!file.type.startsWith("image/")){
+
+        alert("File harus berupa gambar.");
+
+        return;
+
+    }
+
+    showLoading();
 
     const reader = new FileReader();
 
     reader.onload = function(event){
 
-        photo = new Image();
-
         photo.onload = function(){
 
-            const ratio = Math.max(
-                SIZE / photo.width,
-                SIZE / photo.height
-            );
+            imageLoaded = true;
 
-            scale = ratio;
+            photo.style.display = "block";
 
-            zoomSlider.value = 1;
+            autoFit();
 
-            posX = SIZE / 2;
-            posY = SIZE / 2;
-
-            drawCanvas();
+            hideLoading();
 
         };
 
@@ -94,113 +156,16 @@ upload.addEventListener("change", function(e){
 
 });
 
-zoomSlider.addEventListener("input", function(){
+// ========================================
+// RESPONSIVE
+// ========================================
 
-    if(!photo) return;
+window.addEventListener("resize", function(){
 
-    const ratio = Math.max(
-        SIZE / photo.width,
-        SIZE / photo.height
-    );
+    if(imageLoaded){
 
-    scale = ratio * parseFloat(this.value);
+        autoFit();
 
-    drawCanvas();
-
-});
-
-canvas.addEventListener("mousedown", function(e){
-
-    dragging = true;
-
-    startX = e.offsetX;
-    startY = e.offsetY;
-
-    canvas.style.cursor = "grabbing";
+    }
 
 });
-
-window.addEventListener("mouseup", function(){
-
-    dragging = false;
-
-    canvas.style.cursor = "grab";
-
-});
-
-window.addEventListener("mousemove", function(e){
-
-    if(!dragging) return;
-
-    const rect = canvas.getBoundingClientRect();
-
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const scaleCanvas = SIZE / rect.width;
-
-    posX += (x - startX) * scaleCanvas;
-    posY += (y - startY) * scaleCanvas;
-
-    startX = x;
-    startY = y;
-
-    drawCanvas();
-
-});
-
-canvas.addEventListener("touchstart", function(e){
-
-    dragging = true;
-
-    const rect = canvas.getBoundingClientRect();
-
-    startX = e.touches[0].clientX - rect.left;
-    startY = e.touches[0].clientY - rect.top;
-
-});
-
-canvas.addEventListener("touchmove", function(e){
-
-    if(!dragging) return;
-
-    e.preventDefault();
-
-    const rect = canvas.getBoundingClientRect();
-
-    const x = e.touches[0].clientX - rect.left;
-    const y = e.touches[0].clientY - rect.top;
-
-    const scaleCanvas = SIZE / rect.width;
-
-    posX += (x - startX) * scaleCanvas;
-    posY += (y - startY) * scaleCanvas;
-
-    startX = x;
-    startY = y;
-
-    drawCanvas();
-
-},{passive:false});
-
-canvas.addEventListener("touchend", function(){
-
-    dragging = false;
-
-});
-
-downloadBtn.addEventListener("click", function(){
-
-    drawCanvas();
-
-    const link = document.createElement("a");
-
-    link.download = "Twibbon_FORTASI_2025.png";
-
-    link.href = canvas.toDataURL("image/png");
-
-    link.click();
-
-});
-
-drawCanvas();
