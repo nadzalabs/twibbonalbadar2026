@@ -77,10 +77,26 @@
 
   /* ================= BOUNDARY ================= */
 
+  // Minimum amount (in px) of the photo that must stay overlapping the
+  // preview box at all times, so the photo can never fully disappear —
+  // but otherwise dragging is free and empty background CAN show.
+  const MIN_OVERLAP_PX = 60;
+
   function clampPosition() {
-    // Boundary disabled per request — photo can be dragged freely,
-    // with no restriction, even until it moves out of view.
-    return;
+    if (!state.hasImage) return;
+
+    const { w: pw, h: ph } = getPreviewSize();
+    const totalScale = state.baseScale * state.scale;
+    const imgW = state.naturalWidth * totalScale;
+    const imgH = state.naturalHeight * totalScale;
+
+    // Furthest the image center can move while still keeping at least
+    // MIN_OVERLAP_PX of the image inside the preview box.
+    const maxX = Math.max(0, (imgW + pw) / 2 - MIN_OVERLAP_PX);
+    const maxY = Math.max(0, (imgH + ph) / 2 - MIN_OVERLAP_PX);
+
+    state.x = clamp(state.x, -maxX, maxX);
+    state.y = clamp(state.y, -maxY, maxY);
   }
 
   /* ================= AUTO FIT ================= */
