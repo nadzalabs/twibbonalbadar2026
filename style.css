@@ -1,6 +1,6 @@
-/* ==========================================================
+/* ======================================================
    RESET
-========================================================== */
+====================================================== */
 
 *{
     margin:0;
@@ -15,20 +15,14 @@ html{
 body{
 
     font-family:
-    "Segoe UI",
-    Arial,
-    sans-serif;
+        "Segoe UI",
+        Arial,
+        sans-serif;
 
     background:
-    linear-gradient(
-        135deg,
-        #0d5c47,
-        #198754
-    );
+        linear-gradient(135deg,#0b6b53,#12825f);
 
     min-height:100vh;
-
-    padding:30px 15px;
 
     display:flex;
 
@@ -36,11 +30,15 @@ body{
 
     align-items:center;
 
+    padding:20px;
+
+    color:#222;
+
 }
 
-/* ==========================================================
+/* ======================================================
    CONTAINER
-========================================================== */
+====================================================== */
 
 .container{
 
@@ -55,20 +53,19 @@ body{
     overflow:hidden;
 
     box-shadow:
-
-        0 20px 60px rgba(0,0,0,.25);
+        0 20px 60px rgba(0,0,0,.20);
 
 }
 
-/* ==========================================================
+/* ======================================================
    HEADER
-========================================================== */
+====================================================== */
 
 .header{
 
     background:#0f6b56;
 
-    color:white;
+    color:#ffffff;
 
     text-align:center;
 
@@ -80,6 +77,8 @@ body{
 
     font-size:34px;
 
+    font-weight:700;
+
     margin-bottom:10px;
 
     letter-spacing:.5px;
@@ -88,15 +87,15 @@ body{
 
 .header p{
 
-    opacity:.9;
-
     font-size:17px;
+
+    opacity:.95;
 
 }
 
-/* ==========================================================
+/* ======================================================
    PREVIEW
-========================================================== */
+====================================================== */
 
 .preview-section{
 
@@ -104,37 +103,36 @@ body{
 
 }
 
-.preview-area{
+.preview{
 
     position:relative;
 
     width:100%;
 
-    max-width:600px;
+    max-width:560px;
 
-    aspect-ratio:1;
+    aspect-ratio:1/1;
 
     margin:auto;
 
-    background:#ececec;
+    background:#f3f5f7;
 
-    border-radius:18px;
+    border-radius:20px;
 
     overflow:hidden;
+
+    box-shadow:
+        inset 0 0 12px rgba(0,0,0,.08);
 
     user-select:none;
 
     touch-action:none;
 
-    box-shadow:
-
-        inset 0 0 15px rgba(0,0,0,.08);
-
 }
 
-/* ==========================================================
+/* ======================================================
    FOTO
-========================================================== */
+====================================================== */
 
 #photo{
 
@@ -144,22 +142,29 @@ body{
 
     top:50%;
 
-    transform:
-        translate(-50%,-50%);
+    transform:translate(-50%,-50%);
+
+    max-width:none;
 
     display:none;
 
     cursor:grab;
 
-    max-width:none;
-
     user-select:none;
+
+    -webkit-user-drag:none;
 
 }
 
-/* ==========================================================
+#photo.dragging{
+
+    cursor:grabbing;
+
+}
+
+/* ======================================================
    FRAME
-========================================================== */
+====================================================== */
 
 #frame{
 
@@ -179,47 +184,11 @@ body{
 
 }
 
-/* ==========================================================
-   LOADING
-========================================================== */
-
-.loading{
-
-    position:absolute;
-
-    inset:0;
-
-    background:rgba(255,255,255,.75);
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    font-size:18px;
-
-    font-weight:bold;
-
-    color:#0f6b56;
-
-    backdrop-filter:blur(4px);
-
-    z-index:100;
-
-}
-
-.hidden{
-
-    display:none;
-
-}
-
-/* ==========================================================
+/* ======================================================
    CONTROL
-========================================================== */
+====================================================== */
 
-.control-section{
+.controls{
 
     padding:0 35px 35px;
 
@@ -241,35 +210,35 @@ body{
 
     background:#0f6b56;
 
-    color:white;
+    color:#ffffff;
 
     border-radius:14px;
 
     cursor:pointer;
 
-    transition:.25s;
-
     font-weight:600;
+
+    transition:.25s;
 
 }
 
 .upload-button:hover{
 
-    background:#0b5948;
+    background:#0d5b49;
 
 }
 
-/* ==========================================================
+/* ======================================================
    ZOOM
-========================================================== */
+====================================================== */
 
-.slider-group{
+.zoom-box{
 
     margin-top:25px;
 
 }
 
-.slider-group label{
+.zoom-box label{
 
     display:block;
 
@@ -287,9 +256,9 @@ body{
 
 }
 
-/* ==========================================================
+/* ======================================================
    BUTTON
-========================================================== */
+====================================================== */
 
 .button-group{
 
@@ -311,13 +280,13 @@ body{
 
     border-radius:14px;
 
-    cursor:pointer;
-
-    transition:.25s;
-
     font-size:16px;
 
     font-weight:600;
+
+    cursor:pointer;
+
+    transition:.25s;
 
 }
 
@@ -325,13 +294,13 @@ body{
 
 #reset{
 
-    background:#dfe4ea;
+    background:#e3e8ee;
 
 }
 
 #reset:hover{
 
-    background:#ced4da;
+    background:#d2d9e1;
 
 }
 
@@ -341,23 +310,25 @@ body{
 
     background:#f4b400;
 
+    color:#222;
+
 }
 
 #download:hover{
 
-    background:#e0a400;
+    background:#dfa400;
 
 }
 
-/* ==========================================================
+/* ======================================================
    GUIDE
-========================================================== */
+====================================================== */
 
 .guide{
 
     padding:35px;
 
-    background:#f8f9fa;
+    background:#f8f9fb;
 
 }
 
@@ -379,25 +350,19 @@ body{
 
     margin-bottom:10px;
 
-    line-height:1.7;
+    line-height:1.8;
 
 }
 
-/* ==========================================================
+/* ======================================================
    RESPONSIVE
-========================================================== */
+====================================================== */
 
-@media(max-width:768px){
-
-    body{
-
-        padding:20px 10px;
-
-    }
+@media (max-width:768px){
 
     .header{
 
-        padding:25px 15px;
+        padding:25px 20px;
 
     }
 
@@ -407,13 +372,19 @@ body{
 
     }
 
+    .header p{
+
+        font-size:15px;
+
+    }
+
     .preview-section{
 
         padding:20px;
 
     }
 
-    .control-section{
+    .controls{
 
         padding:0 20px 25px;
 
@@ -433,23 +404,35 @@ body{
 
 }
 
-@media(max-width:480px){
+@media (max-width:480px){
 
-    .header h1{
+    body{
 
-        font-size:23px;
+        padding:10px;
 
     }
 
-    .header p{
+    .container{
 
-        font-size:15px;
+        border-radius:18px;
+
+    }
+
+    .header h1{
+
+        font-size:24px;
+
+    }
+
+    .preview{
+
+        border-radius:16px;
 
     }
 
     .upload-button{
 
-        height:52px;
+        height:50px;
 
         font-size:15px;
 
