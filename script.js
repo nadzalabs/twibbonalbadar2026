@@ -1,5 +1,5 @@
 /* =========================================================
-   Twibbon Al Badar 2026 - script.js
+   Twibbon FORTASI 2026 - SMP MBS Al Badar - script.js
    Vanilla JS - No dependencies - Canvas only on download
    ========================================================= */
 
@@ -26,7 +26,7 @@
     pinching: false,
     lastDistance: 0,
 
-    // internal (not in spec but required for math)
+    // internal (required for math, not part of spec's minimal state)
     naturalWidth: 0,
     naturalHeight: 0,
     baseScale: 0,       // scale required to "cover" the preview at zoom = 1
@@ -55,13 +55,6 @@
     const dx = touches[0].clientX - touches[1].clientX;
     const dy = touches[0].clientY - touches[1].clientY;
     return Math.sqrt(dx * dx + dy * dy);
-  }
-
-  function getMidpoint(touches) {
-    return {
-      x: (touches[0].clientX + touches[1].clientX) / 2,
-      y: (touches[0].clientY + touches[1].clientY) / 2
-    };
   }
 
   function requestRender() {
@@ -139,6 +132,7 @@
         state.naturalWidth = img.naturalWidth;
         state.naturalHeight = img.naturalHeight;
         photoEl.src = e.target.result;
+        photoEl.style.display = 'block'; // CSS default is display:none
         state.hasImage = true;
         autoFit();
       };
@@ -161,7 +155,7 @@
     state.startY = state.y;
     state.startPointerX = e.clientX;
     state.startPointerY = e.clientY;
-    previewEl.style.cursor = 'grabbing';
+    photoEl.classList.add('dragging');
   });
 
   window.addEventListener('mousemove', function (e) {
@@ -177,14 +171,14 @@
   window.addEventListener('mouseup', function () {
     if (state.dragging) {
       state.dragging = false;
-      previewEl.style.cursor = 'grab';
+      photoEl.classList.remove('dragging');
     }
   });
 
   window.addEventListener('mouseleave', function () {
     if (state.dragging) {
       state.dragging = false;
-      previewEl.style.cursor = 'grab';
+      photoEl.classList.remove('dragging');
     }
   });
 
@@ -255,8 +249,6 @@
     state.lastDistance = 0;
   }, { passive: true });
 
-  /* ================= PINCH ZOOM (handled above in touchmove) ================= */
-
   /* ================= MOUSE WHEEL ================= */
 
   previewEl.addEventListener('wheel', function (e) {
@@ -292,24 +284,39 @@
   function loadImageFromSrc(src) {
     return new Promise(function (resolve, reject) {
       const img = new Image();
-      img.crossOrigin = 'anonymous';
+      // NOTE: no crossOrigin here — these are same-origin/local assets.
+      // Setting crossOrigin on same-origin/file:// images can cause them
+      // to fail to load, which silently breaks the download.
       img.onload = function () { resolve(img); };
-      img.onerror = reject;
+      img.onerror = function () {
+        reject(new Error('Gagal memuat gambar: ' + src));
+      };
       img.src = src;
     });
   }
 
   function triggerDownload(canvas) {
+    let dataUrl;
+    try {
+      dataUrl = canvas.toDataURL('image/png', 1.0);
+    } catch (err) {
+      console.error('Gagal membuat file gambar (kemungkinan canvas ternoda / CORS):', err);
+      alert('Gagal membuat file. Coba buka website ini lewat server (http/https) atau GitHub Pages, bukan langsung dari file di komputer.');
+      return;
+    }
     const link = document.createElement('a');
     link.download = 'Twibbon_AlBadar_2026.png';
-    link.href = canvas.toDataURL('image/png', 1.0);
+    link.href = dataUrl;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   }
 
   downloadEl.addEventListener('click', function () {
-    if (!state.hasImage) return;
+    if (!state.hasImage) {
+      alert('Silakan pilih foto terlebih dahulu.');
+      return;
+    }
 
     const CANVAS_SIZE = 2048;
     const canvas = document.createElement('canvas');
@@ -341,12 +348,9 @@
         ctx.drawImage(frameImg, 0, 0, CANVAS_SIZE, CANVAS_SIZE);
         triggerDownload(canvas);
       })
-      .catch(function () {
-        // Fallback: draw whatever is available even if one image failed
-        try {
-          ctx.drawImage(frameEl, 0, 0, CANVAS_SIZE, CANVAS_SIZE);
-        } catch (err) { /* ignore */ }
-        triggerDownload(canvas);
+      .catch(function (err) {
+        console.error('Download gagal:', err);
+        alert('Download gagal: ' + err.message);
       });
   });
 
@@ -358,7 +362,5 @@
     clampPosition();
     requestRender();
   });
-
-  previewEl.style.cursor = 'grab';
 
 })();
