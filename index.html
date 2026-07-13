@@ -5,13 +5,21 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-    <meta name="description" content="Twibbon FORTASI 2025 SMP MBS Al Badar Prambanan">
+    <meta
+        name="description"
+        content="Website Twibbon FORTASI 2025 SMP MBS Al Badar Prambanan">
 
-    <title>Twibbon FORTASI 2025 | SMP MBS Al Badar</title>
+    <title>
+        Twibbon FORTASI 2025 | SMP MBS Al Badar
+    </title>
 
-    <link rel="stylesheet" href="style.css">
+    <link
+        rel="stylesheet"
+        href="style.css">
 
 </head>
 
@@ -25,7 +33,9 @@
 
         <header class="header">
 
-            <h1>TWIBBON FORTASI 2025</h1>
+            <h1>
+                TWIBBON FORTASI 2025
+            </h1>
 
             <p>
                 SMP MBS Al Badar Prambanan
@@ -39,61 +49,55 @@
 
         <section class="preview-section">
 
-            <div id="preview" class="preview-area">
+            <div
+                id="preview"
+                class="preview">
 
-                <!-- Loading -->
-
-                <div id="loading" class="loading hidden">
-
-                    Memuat Foto...
-
-                </div>
-
-                <!-- Foto -->
+                <!-- Foto Peserta -->
 
                 <img
                     id="photo"
                     src=""
                     alt="Foto Peserta"
-                    draggable="false"
-                >
+                    draggable="false">
 
-                <!-- Frame -->
+                <!-- Frame Twibbon -->
 
                 <img
                     id="frame"
                     src="frame.png"
                     alt="Frame Twibbon"
-                    draggable="false"
-                >
+                    draggable="false">
 
             </div>
 
         </section>
 
         <!-- =========================
-             KONTROL
+             CONTROL
         ========================== -->
 
-        <section class="control-section">
+        <section class="controls">
 
             <!-- Upload -->
 
-            <label class="upload-button">
+            <label
+                class="upload-button"
+                for="upload">
 
                 📷 Pilih Foto
 
-                <input
-                    type="file"
-                    id="upload"
-                    accept="image/png,image/jpeg,image/jpg,image/webp"
-                    hidden>
-
             </label>
+
+            <input
+                type="file"
+                id="upload"
+                accept="image/png,image/jpeg,image/jpg,image/webp"
+                hidden>
 
             <!-- Zoom -->
 
-            <div class="slider-group">
+            <div class="zoom-box">
 
                 <label for="zoom">
 
@@ -141,32 +145,33 @@
 
         <section class="guide">
 
-            <h2>Cara Menggunakan</h2>
+            <h2>
+                Cara Menggunakan
+            </h2>
 
             <ol>
 
-                <li>Klik <strong>Pilih Foto</strong>.</li>
+                <li>
+                    Klik tombol <strong>Pilih Foto</strong>.
+                </li>
 
-                <li>Geser foto agar pas pada bingkai.</li>
+                <li>
+                    Geser posisi foto agar sesuai dengan frame.
+                </li>
 
-                <li>Atur ukuran menggunakan slider.</li>
+                <li>
+                    Atur ukuran foto menggunakan slider.
+                </li>
 
-                <li>Klik <strong>Download Twibbon</strong>.</li>
+                <li>
+                    Klik <strong>Download Twibbon</strong>.
+                </li>
 
             </ol>
 
         </section>
 
     </main>
-
-    <!-- Canvas untuk export HD (disembunyikan) -->
-
-    <canvas
-        id="exportCanvas"
-        width="2048"
-        height="2048"
-        hidden>
-    </canvas>
 
     <script src="script.js"></script>
 
