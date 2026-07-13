@@ -78,18 +78,9 @@
   /* ================= BOUNDARY ================= */
 
   function clampPosition() {
-    if (!state.hasImage) return;
-
-    const { w: pw, h: ph } = getPreviewSize();
-    const totalScale = state.baseScale * state.scale;
-    const imgW = state.naturalWidth * totalScale;
-    const imgH = state.naturalHeight * totalScale;
-
-    const maxX = Math.max(0, (imgW - pw) / 2);
-    const maxY = Math.max(0, (imgH - ph) / 2);
-
-    state.x = clamp(state.x, -maxX, maxX);
-    state.y = clamp(state.y, -maxY, maxY);
+    // Boundary disabled per request — photo can be dragged freely,
+    // with no restriction, even until it moves out of view.
+    return;
   }
 
   /* ================= AUTO FIT ================= */
@@ -97,7 +88,9 @@
   // Extra zoom baked into the auto-fit so there is always a little
   // room to drag the photo immediately, even before touching the
   // zoom slider. Purely visual headroom — boundary rules still apply.
-  const OVERSCAN = 1.7;
+  // Boundary is disabled (see clampPosition), so no overscan needed —
+  // auto-fit stays at true cover, natural, no pre-zoom.
+  const OVERSCAN = 1.0;
 
   function computeBaseScale() {
     const { w: pw, h: ph } = getPreviewSize();
