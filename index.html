@@ -19,7 +19,9 @@
 
     <main class="container">
 
-        <!-- Header -->
+        <!-- =========================
+             HEADER
+        ========================== -->
 
         <header class="header">
 
@@ -31,18 +33,28 @@
 
         </header>
 
-        <!-- Preview -->
+        <!-- =========================
+             PREVIEW
+        ========================== -->
 
         <section class="preview-section">
 
-            <div class="preview-area">
+            <div id="preview" class="preview-area">
+
+                <!-- Loading -->
+
+                <div id="loading" class="loading hidden">
+
+                    Memuat Foto...
+
+                </div>
 
                 <!-- Foto -->
 
                 <img
                     id="photo"
                     src=""
-                    alt="Preview Foto"
+                    alt="Foto Peserta"
                     draggable="false"
                 >
 
@@ -59,23 +71,29 @@
 
         </section>
 
-        <!-- Kontrol -->
+        <!-- =========================
+             KONTROL
+        ========================== -->
 
         <section class="control-section">
 
+            <!-- Upload -->
+
             <label class="upload-button">
 
-                Pilih Foto
+                📷 Pilih Foto
 
                 <input
                     type="file"
                     id="upload"
-                    accept="image/*"
+                    accept="image/png,image/jpeg,image/jpg,image/webp"
                     hidden>
 
             </label>
 
-            <div class="slider">
+            <!-- Zoom -->
+
+            <div class="slider-group">
 
                 <label for="zoom">
 
@@ -88,20 +106,26 @@
                     id="zoom"
                     min="1"
                     max="3"
-                    step="0.01"
-                    value="1">
+                    value="1"
+                    step="0.01">
 
             </div>
 
+            <!-- Tombol -->
+
             <div class="button-group">
 
-                <button id="reset">
+                <button
+                    id="reset"
+                    type="button">
 
                     Reset
 
                 </button>
 
-                <button id="download">
+                <button
+                    id="download"
+                    type="button">
 
                     Download Twibbon
 
@@ -111,19 +135,21 @@
 
         </section>
 
-        <!-- Informasi -->
+        <!-- =========================
+             PETUNJUK
+        ========================== -->
 
-        <section class="info">
+        <section class="guide">
 
             <h2>Cara Menggunakan</h2>
 
             <ol>
 
-                <li>Pilih foto dari galeri.</li>
+                <li>Klik <strong>Pilih Foto</strong>.</li>
 
-                <li>Geser foto agar pas di dalam frame.</li>
+                <li>Geser foto agar pas pada bingkai.</li>
 
-                <li>Perbesar atau perkecil menggunakan slider.</li>
+                <li>Atur ukuran menggunakan slider.</li>
 
                 <li>Klik <strong>Download Twibbon</strong>.</li>
 
@@ -132,6 +158,15 @@
         </section>
 
     </main>
+
+    <!-- Canvas untuk export HD (disembunyikan) -->
+
+    <canvas
+        id="exportCanvas"
+        width="2048"
+        height="2048"
+        hidden>
+    </canvas>
 
     <script src="script.js"></script>
 
